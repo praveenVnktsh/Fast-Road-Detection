@@ -21,7 +21,7 @@ class LitModel(pl.LightningModule):
         self.convlstm = ConvLSTM(512, 512, kernel_size=(
             3, 3), num_layers=1, batch_first=True)
         self.deconv = FCN32s(n_class=1)
-
+        self.hidden = None
         self.save_hyperparameters()
 
     def configure_optimizers(self):
@@ -29,7 +29,25 @@ class LitModel(pl.LightningModule):
         return optimizer
 
     def forward(self, z):
-        out = self.model.decode(z)
+        # out = self.model.decode(z)
+
+        ref_after = 0.9
+        if np.random.rand() > ref_after:
+            self.hidden = None
+            print("Weights Cleared")
+            features = torch.unsqueeze(self.vgg16(z)['x5'], dim=1)
+        # else:
+        features = torch.unsqueeze(self.vgg16(z)['x5'], dim=1)
+        # choose = np.random.randint(0, 2)
+        # # print(choose)
+        # if choose:
+        #     features = torch.unsqueeze(self.vgg11(z)['x5'], dim=1)
+        # else:
+        #     features = torch.unsqueeze(self.vgg16(z)['x5'], dim=1)
+
+        prediction, self.hidden = self.convlstm(features, self.hidden)
+        out = self.deconv(prediction[-1][:, 0])
+
         return out
 
     def training_step(self, batch, index):
@@ -94,41 +112,20 @@ class LitModel(pl.LightningModule):
 
         dic = {'loss': loss}
         return dic
-    #     image = batch['input']
-    #     target = torch.cat((batch['target'], batch['depth']), dim = 1)
 
-    #     intent = batch['intent']
-    #     dist = batch['dist']
+    def test_step(self, batch, batch_idx):
+        # training_step defines the train loop. It is independent of forward.
+        image = batch['input']
+        target = batch['target']
+        b, c, h, w = image.size()
 
-    #     out = self.model(image, intent, dist)
+        choose = np.random.randint(0, 2)
+        if choose:
+            features = torch.unsqueeze(self.vgg11(image)['x5'], dim=1)
+        else:
+            features = torch.unsqueeze(self.vgg16(image)['x5'], dim=1)
 
-    #     loss = F.binary_cross_entropy(out['recon'], target)
+        prediction, self.hidden = self.convlstm(features, self.hidden)
+        maps = self.deconv(prediction[-1][:, 0])
 
-    #     kld = -0.5 * torch.sum(1 + out['logvar'] - out['mu'].pow(2) - out['logvar'].exp())
-    #     loss += kld
-
-    #     self.log('val_loss', loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-
-    #     if index == 0:
-    #         outmap = out['recon']
-
-    #         outmapdepth = outmap[:, 0, :, :].view(-1, 1, 128, 128)
-    #         outmapseg = outmap[:, 1, :, :].view(-1, 1, 128, 128)
-
-    #         targetmapseg = target[:, 0, :, :].view(-1, 1, 128, 128)
-    #         targetmapdepth = target[:, 1, :, :].view(-1, 1, 128, 128)
-
-    #         outmapdepth = torch.cat((outmapdepth, outmapdepth, outmapdepth), dim = 1).float().detach().cpu()
-    #         outmapseg = torch.cat((outmapseg, outmapseg, outmapseg), dim = 1).float().detach().cpu()
-
-    #         targetmapseg = torch.cat((targetmapseg, targetmapseg, targetmapseg), dim = 1).float().detach().cpu()
-    #         targetmapdepth = torch.cat((targetmapdepth, targetmapdepth, targetmapdepth), dim = 1).float().detach().cpu()
-    #         datatocat = (image.float().detach().cpu(), outmapdepth, targetmapdepth, outmapseg, targetmapseg)
-
-    #         data = torch.cat((image.float().detach().cpu(), outmapdepth, targetmapdepth, outmapseg, targetmapseg), dim = 2)
-
-    #         self.logger.experiment.add_images('valimages', data, self.current_epoch)
-
-    #     dic = {'loss' : loss}
-
-    #     return dic
+        return {"out": maps, "target": target}

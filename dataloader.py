@@ -52,7 +52,7 @@ class CustomDataset(Dataset):
 
 class lit_custom_data(pl.LightningDataModule):
 
-    def setup(self, stage):
+    def setup(self, stage=None):
 
         self.configs = Configs()
         self.dataset = CustomDataset(self.configs)
@@ -70,6 +70,10 @@ class lit_custom_data(pl.LightningDataModule):
     def val_dataloader(self):
         return DataLoader(self.dataset, batch_size=self.configs.batchSize,
                           num_workers=self.cpu, sampler=SubsetRandomSampler(self.valIndices), pin_memory=self.pin)
+
+    def test_dataloader(self):
+        return DataLoader(self.dataset, batch_size=1,
+                          num_workers=self.cpu, pin_memory=self.pin)
 
 
 if __name__ == "__main__":
