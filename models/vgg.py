@@ -23,7 +23,6 @@ cfg = {
 }
 
 
-
 def make_layers(cfg, batch_norm=False):
     layers = []
     in_channels = 3
@@ -40,9 +39,8 @@ def make_layers(cfg, batch_norm=False):
     return nn.Sequential(*layers)
 
 
-
 class VGGNet(VGG):
-    def __init__(self, pretrained=True, model='vgg16', requires_grad=True, remove_fc=True, show_params=False):
+    def __init__(self, pretrained=True, model='vgg16', requires_grad=False, remove_fc=True, show_params=False):
         super().__init__(make_layers(cfg[model]))
         self.ranges = ranges[model]
 
@@ -71,10 +69,11 @@ class VGGNet(VGG):
 
         return output
 
+
 if __name__ == "__main__":
-    vgg16 = VGGNet(model = 'vgg16')
-    vgg11 = VGGNet(model = 'vgg11')
-    x  = torch.randn(1, 3, 400, 270)
+    vgg16 = VGGNet(model='vgg16')
+    vgg11 = VGGNet(model='vgg11')
+    x = torch.randn(1, 3, 400, 270)
     print(vgg16)
     print(vgg11)
     print(vgg16(x)['x5'].size())

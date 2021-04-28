@@ -14,6 +14,7 @@ from configs import Configs
 
 configs = Configs()
 
+
 class CustomDataset(Dataset):
 
     def __init__(self, configs: Configs):
@@ -52,25 +53,23 @@ class CustomDataset(Dataset):
 class lit_custom_data(pl.LightningDataModule):
 
     def setup(self, stage):
-    
+
         self.configs = Configs()
         self.dataset = CustomDataset(self.configs)
         dataset_size = len(self.dataset)
         indices = list(range(dataset_size))
         split = int(np.floor(self.configs.valSplit * dataset_size))
         self.trainIndices, self.valIndices = indices[split:], indices[:split]
-
-
+        self.cpu = 0
+        self.pin = True
 
     def train_dataloader(self):
         return DataLoader(self.dataset, batch_size=self.configs.batchSize,
-                         num_workers=0, sampler=SubsetRandomSampler(self.trainIndices))
+                          num_workers=self.cpu, sampler=SubsetRandomSampler(self.trainIndices), pin_memory=self.pin)
 
     def val_dataloader(self):
         return DataLoader(self.dataset, batch_size=self.configs.batchSize,
-                         num_workers=0, sampler=SubsetRandomSampler(self.valIndices))
-
-
+                          num_workers=self.cpu, sampler=SubsetRandomSampler(self.valIndices), pin_memory=self.pin)
 
 
 if __name__ == "__main__":
