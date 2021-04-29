@@ -22,8 +22,15 @@ class Resnet(nn.Module):
         modules = list(self.model.children())[:-2]
         self.model = nn.Sequential(*modules)
 
+
         for p in self.model.parameters():
             p.requires_grad = requires_grad
+
+        if model == 'resnet101':
+            self.model = nn.Sequential(
+                self.model,
+                nn.Conv2d(2048, 512, 3, 1, 1)
+            )
 
         if show_params:
             for name, param in self.named_parameters():
@@ -40,6 +47,7 @@ class Resnet(nn.Module):
 if __name__ == "__main__":
     resnet18 = Resnet(model='resnet18')
     resnet101 = Resnet(model='resnet101')
+    
     x = torch.randn(1, 3, 160, 160)
     print(resnet18)
     print(resnet101)

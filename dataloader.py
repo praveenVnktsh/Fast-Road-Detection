@@ -1,14 +1,16 @@
 
+from torch import functional
 from torch.utils.data.dataset import Dataset
 import torch
 from torchvision.transforms import transforms
 from torch.utils.data.sampler import SubsetRandomSampler
 from torch.utils.data import DataLoader
 from torch.optim.rmsprop import RMSprop
-
+import torchvision
 import numpy as np
 
 import pytorch_lightning as pl
+from torchvision.transforms.functional import hflip
 
 from configs import Configs
 
@@ -22,9 +24,9 @@ class CustomDataset(Dataset):
         self.device = configs.device
         self.path = configs.datasetPath
         self.size = (configs.image_size, configs.image_size)
-
+        print('Loading dataset')
         self.data = torch.load(self.path)
-        self.length = len(self.data)
+        self.length = len(self.data) * 2
 
         print(self.length, 'images in', self.path)
 
@@ -47,14 +49,21 @@ class CustomDataset(Dataset):
         ])
 
     def __getitem__(self, index):
-
+        flag = 0
         if index > self.length:
             raise Exception(
                 f"Dataloader out of index. Max Index:{self.length - self.n_images}, Index asked:{index}.")
+        if index >= self.length / 2:
+            index = int(index - self.length // 2)
+            flag = 1
 
         image = self.transform(self.data[index]['front'])
         seg = self.segmentation(self.data[index]['road']).bool().float()
-        # images.shape = [3,128,128]
+        # image.shape = [3,160,160]
+
+        if flag:
+            image = torchvision.transforms.functional.hflip(image)
+            seg = torchvision.transforms.functional.hflip(seg)
 
         return {'input': image, 'target': seg}
 
@@ -72,7 +81,7 @@ class lit_custom_data(pl.LightningDataModule):
         indices = list(range(dataset_size))
         split = int(np.floor(self.configs.valSplit * dataset_size))
         self.trainIndices, self.valIndices = indices[split:], indices[:split]
-        self.cpu = 0
+        self.cpu = 4
         self.pin = True
 
     def train_dataloader(self):

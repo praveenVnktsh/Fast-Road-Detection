@@ -24,12 +24,14 @@ import os
 # class LightningMNISTClassifier(pl.LightningModule):
 if __name__ == '__main__':
     hparams = {
-        'lr': 0.01
+        'lr': 0.0019054607179632484
     }
     model = LitModel(hparams)
 
-    dataset = lit_custom_data()
+    dataset = lit_custom_data(
+        "/home/i1/lookingfastslow/lr_find_temp_model.ckpt")
 
-    trainer = pl.Trainer(gpus=1, )
+    trainer = pl.Trainer(gpus=1, max_epochs=120)
+    # trainer.tune(model, dataset)
     trainer.fit(model, dataset)
     print("hello")

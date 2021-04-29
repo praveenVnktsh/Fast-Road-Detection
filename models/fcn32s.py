@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch
 
+
 class FCN32s(nn.Module):
 
     def __init__(self, n_class):
@@ -9,7 +10,7 @@ class FCN32s(nn.Module):
         # self.save_hyperparameters()
         self.relu = nn.ReLU(inplace=True)
         self.deconv1 = nn.ConvTranspose2d(
-            512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+            128, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn1 = nn.BatchNorm2d(512)
         self.deconv2 = nn.ConvTranspose2d(
             512, 256, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
@@ -46,7 +47,7 @@ class FCN32s(nn.Module):
         score = self.classifier(score)
 
         return score  # size=(N, n_class, x.H/1, x.W/1)
-    
+
     # def training_step(self, batch, batch_idx):
     #     # training_step defines the train loop. It is independent of forward
     #     x, y = batch.values()
@@ -63,9 +64,7 @@ class FCN32s(nn.Module):
     #     loss = F.cross_entropy(x_hat, y)
     #     self.log('valid_loss', loss,on_step=True)
 
-
     # def configure_optimizers(self):
     #     optimizer = RMSprop(self.parameters(), lr=self.configs.base_lr,
     #                 momentum=self.configs.momentum, weight_decay=self.configs.weight_decay)
     #     return optimizer
-

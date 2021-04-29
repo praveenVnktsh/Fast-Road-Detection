@@ -1,4 +1,5 @@
 from models.convlstm import ConvLSTM
+from models.resnet import Resnet
 from models.fcn32s import FCN32s
 from models.vgg import VGGNet
 import torch
@@ -15,10 +16,12 @@ class LitModel(pl.LightningModule):
         super().__init__()
         self.learning_rate = hparams['lr']
 
-        self.vgg16 = VGGNet(model='vgg16')
-        self.vgg11 = VGGNet(model='vgg11')
-        self.extractors = [self.vgg11, self.vgg16]
-        self.convlstm = ConvLSTM(512, 512, kernel_size=(
+        self.resnet101 = Resnet(model='resnet101')
+
+        self.resnet18 = Resnet(model='resnet18')
+
+        self.extractors = [self.resnet18, self.resnet101]
+        self.convlstm = ConvLSTM(512, 128, kernel_size=(
             3, 3), num_layers=1, batch_first=True)
         self.deconv = FCN32s(n_class=1)
         self.hidden = None
@@ -35,15 +38,9 @@ class LitModel(pl.LightningModule):
         if np.random.rand() > ref_after:
             self.hidden = None
             print("Weights Cleared")
-            features = torch.unsqueeze(self.vgg16(z)['x5'], dim=1)
-        # else:
-        features = torch.unsqueeze(self.vgg16(z)['x5'], dim=1)
-        # choose = np.random.randint(0, 2)
-        # # print(choose)
-        # if choose:
-        #     features = torch.unsqueeze(self.vgg11(z)['x5'], dim=1)
-        # else:
-        #     features = torch.unsqueeze(self.vgg16(z)['x5'], dim=1)
+            features = torch.unsqueeze(self.resnet101(z)['x5'], dim=1)
+
+        features = torch.unsqueeze(self.resnet101(z)['x5'], dim=1)
 
         prediction, self.hidden = self.convlstm(features, self.hidden)
         out = self.deconv(prediction[-1][:, 0])
@@ -57,8 +54,8 @@ class LitModel(pl.LightningModule):
         b, c, h, w = image.size()
         # print(image.size(), self.vgg11(image)['x5'].size())
         features = [
-            torch.unsqueeze(self.vgg11(image)['x5'], dim=1),
-            torch.unsqueeze(self.vgg16(image)['x5'], dim=1)
+            torch.unsqueeze(self.resnet18(image)['x5'], dim=1),
+            torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
         ]
 
         b, _, c, h, w = features[0].size()
@@ -84,8 +81,8 @@ class LitModel(pl.LightningModule):
         b, c, h, w = image.size()
         # print(image.size(), self.vgg11(image)['x5'].size())
         features = [
-            torch.unsqueeze(self.vgg11(image)['x5'], dim=1),
-            torch.unsqueeze(self.vgg16(image)['x5'], dim=1)
+            torch.unsqueeze(self.resnet18(image)['x5'], dim=1),
+            torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
         ]
 
         b, _, c, h, w = features[0].size()
@@ -121,9 +118,9 @@ class LitModel(pl.LightningModule):
 
         choose = np.random.randint(0, 2)
         if choose:
-            features = torch.unsqueeze(self.vgg11(image)['x5'], dim=1)
+            features = torch.unsqueeze(self.resnet18(image)['x5'], dim=1)
         else:
-            features = torch.unsqueeze(self.vgg16(image)['x5'], dim=1)
+            features = torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
 
         prediction, self.hidden = self.convlstm(features, self.hidden)
         maps = self.deconv(prediction[-1][:, 0])
