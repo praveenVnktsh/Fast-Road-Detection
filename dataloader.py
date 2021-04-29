@@ -28,7 +28,19 @@ class CustomDataset(Dataset):
 
         print(self.length, 'images in', self.path)
 
+        # transforms.Resize(256),
+        # transforms.CenterCrop(224),
+        # transforms.ToTensor(),
+        # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         self.transform = transforms.Compose([
+            transforms.ToPILImage(),
+            transforms.Resize(self.size),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
+                                 0.229, 0.224, 0.225]),
+        ])
+
+        self.segmentation = transforms.Compose([
             transforms.ToPILImage(),
             transforms.Resize(self.size),
             transforms.ToTensor(),
@@ -40,8 +52,8 @@ class CustomDataset(Dataset):
             raise Exception(
                 f"Dataloader out of index. Max Index:{self.length - self.n_images}, Index asked:{index}.")
 
-        image = self.transform(self.data[index]['front']['rgb']).float()
-        seg = self.transform(self.data[index]['front']['seg']).float()
+        image = self.transform(self.data[index]['front'])
+        seg = self.segmentation(self.data[index]['road']).bool().float()
         # images.shape = [3,128,128]
 
         return {'input': image, 'target': seg}
@@ -79,8 +91,8 @@ class lit_custom_data(pl.LightningDataModule):
 if __name__ == "__main__":
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     path = r"dataset.pt"
-    # cd = CustomDataset(config)
-    # print(cd[0])
+    cd = CustomDataset(configs)
+    print(cd[0])
     data_module = lit_custom_data()
     print("python")
     # print(cd[0]['front']['seg'].shape)
