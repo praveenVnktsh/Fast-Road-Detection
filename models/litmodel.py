@@ -24,6 +24,7 @@ class LitModel(pl.LightningModule):
         self.hidden = None
         self.save_hyperparameters()
 
+    
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
         return optimizer
