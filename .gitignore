@@ -7,3 +7,5 @@ libs/models/__pycache__/jpu.cpython-37.pyc
 lightning_logs/
 dataset.pt
 lookingfastslow.zip
+testset.pt
+datasetsmall.pt
