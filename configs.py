@@ -41,7 +41,7 @@ class Configs():
 
         # train parameters
         self.nEpochs = 151
-        self.batchSize = 512
+        self.batchSize = 16
         self.base_lr = 0.0002
         self.power = 0.9
         self.momentum = 0.9

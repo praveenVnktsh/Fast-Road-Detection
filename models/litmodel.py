@@ -34,13 +34,14 @@ class LitModel(pl.LightningModule):
     def forward(self, z):
         # out = self.model.decode(z)
 
-        ref_after = 0.9
+        ref_after = 0.8
         if np.random.rand() > ref_after:
             self.hidden = None
             print("Weights Cleared")
             features = torch.unsqueeze(self.resnet101(z)['x5'], dim=1)
-
-        features = torch.unsqueeze(self.resnet101(z)['x5'], dim=1)
+            prediction, self.hidden = self.convlstm(features, self.hidden)
+        # else:
+        features = torch.unsqueeze(self.resnet18(z)['x5'], dim=1)
 
         prediction, self.hidden = self.convlstm(features, self.hidden)
         out = self.deconv(prediction[-1][:, 0])

@@ -3,7 +3,7 @@ from torch import functional
 from torch.utils.data.dataset import Dataset
 import torch
 from torchvision.transforms import transforms
-from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data.sampler import SubsetRandomSampler, SequentialSampler
 from torch.utils.data import DataLoader
 from torch.optim.rmsprop import RMSprop
 import torchvision
@@ -41,6 +41,11 @@ class CustomDataset(Dataset):
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
                                  0.229, 0.224, 0.225]),
         ])
+        self.unormalized = transforms.Compose([
+            transforms.ToPILImage(),
+            transforms.Resize(self.size),
+            transforms.ToTensor(),
+        ])
 
         self.segmentation = transforms.Compose([
             transforms.ToPILImage(),
@@ -59,13 +64,15 @@ class CustomDataset(Dataset):
 
         image = self.transform(self.data[index]['front'])
         seg = self.segmentation(self.data[index]['road']).bool().float()
+        real = self.unormalized(self.data[index]['front'])
         # image.shape = [3,160,160]
 
         if flag:
             image = torchvision.transforms.functional.hflip(image)
             seg = torchvision.transforms.functional.hflip(seg)
+            real = torchvision.transforms.functional.hflip(real)
 
-        return {'input': image, 'target': seg}
+        return {'input': image, 'target': seg, "real": real}
 
     def __len__(self):
         return self.length
@@ -94,7 +101,7 @@ class lit_custom_data(pl.LightningDataModule):
 
     def test_dataloader(self):
         return DataLoader(self.dataset, batch_size=1,
-                          num_workers=self.cpu, pin_memory=self.pin)
+                          num_workers=0, sampler=SequentialSampler(self.valIndices), pin_memory=self.pin)
 
 
 if __name__ == "__main__":

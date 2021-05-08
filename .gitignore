@@ -13,3 +13,5 @@ chkpoints/Resnet_LSTM_FCN_2/hparams.yaml
 chkpoints/Resnet_LSTM_FCN_2/checkpoints/epoch=119-step=3839.ckpt
 datasetsmall.pt
 tp.png
+testset.pt
+datasetsmall.pt
