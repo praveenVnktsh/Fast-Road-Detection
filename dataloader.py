@@ -20,14 +20,17 @@ configs = Configs()
 class CustomDataset(Dataset):
 
     def __init__(self, configs: Configs):
-
+        
+        self.isSequence = configs.isSequence
+        self.sequenceLength = 6
         self.device = configs.device
         self.path = configs.datasetPath
         self.size = (configs.image_size, configs.image_size)
         print('Loading dataset')
         self.data = torch.load(self.path)
-        self.length = len(self.data) * 2
+        print('Loaded Dataset')        
 
+        self.length = (len(self.data) - self.sequenceLength) * 2
         print(self.length, 'images in', self.path)
 
         # transforms.Resize(256),
@@ -49,21 +52,41 @@ class CustomDataset(Dataset):
         ])
 
     def __getitem__(self, index):
-        flag = 0
-        if index > self.length:
-            raise Exception(
-                f"Dataloader out of index. Max Index:{self.length - self.n_images}, Index asked:{index}.")
-        if index >= self.length / 2:
-            index = int(index - self.length // 2)
-            flag = 1
+        
+        if not self.isSequence:
+            flip = False
+            if index >= self.length / 2:
+                flip = True
+                index = index % (self.length // 2)
 
-        image = self.transform(self.data[index]['front'])
-        seg = self.segmentation(self.data[index]['road']).bool().float()
-        # image.shape = [3,160,160]
+            image = self.transform(self.data[index]['front'])
+            seg = self.segmentation(self.data[index]['road']).bool().float()
 
-        if flag:
-            image = torchvision.transforms.functional.hflip(image)
-            seg = torchvision.transforms.functional.hflip(seg)
+            if flip:
+                image = torchvision.transforms.functional.hflip(image)
+                seg = torchvision.transforms.functional.hflip(seg)
+        else:
+            images = []
+            segs = []
+            flip = False
+            if index >= self.length / 2:
+                flip = True
+
+                index = index % (self.length // 2)
+
+            for i in range(index, index + 6):
+                image = self.transform(self.data[i]['front'])
+                seg = self.segmentation(self.data[i]['road']).bool().float()
+
+                if flip:
+                    image = torchvision.transforms.functional.hflip(image)
+                    seg = torchvision.transforms.functional.hflip(seg)
+                images.append(image)
+                segs.append(seg)
+
+            seg = torch.stack(tuple(segs), dim = 0)
+            image = torch.stack(tuple(images), dim = 0)
+
 
         return {'input': image, 'target': seg}
 
@@ -99,9 +122,9 @@ class lit_custom_data(pl.LightningDataModule):
 
 if __name__ == "__main__":
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    path = r"dataset.pt"
+    path = "datasetsmall.pt"
     cd = CustomDataset(configs)
-    print(cd[0])
-    data_module = lit_custom_data()
-    print("python")
+    print(cd[0]['input'].size())
+    # data_module = lit_custom_data()
+    # print("python")
     # print(cd[0]['front']['seg'].shape)

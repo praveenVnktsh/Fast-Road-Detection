@@ -51,20 +51,22 @@ class LitModel(pl.LightningModule):
         # training_step defines the train loop. It is independent of forward.
         image = batch['input']
         target = batch['target']
-        b, c, h, w = image.size()
+        # b, c, h, w = image.size()
         # print(image.size(), self.vgg11(image)['x5'].size())
         features = [
             torch.unsqueeze(self.resnet18(image)['x5'], dim=1),
-            torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
+            # torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
         ]
 
-        b, _, c, h, w = features[0].size()
-        # print(features[0].size())
-        hidden = self.convlstm._init_hidden(batch_size=b, image_size=(h, w))
-        for i in range(6):
-            choose = np.random.randint(0, 2)
-            prediction, hidden = self.convlstm(features[choose], hidden)
-        maps = self.deconv(prediction[-1][:, 0])
+        # b, _, c, h, w = features[0].size()
+        # # print(features[0].size())
+        # hidden = self.convlstm._init_hidden(batch_size=b, image_size=(h, w))
+        # for i in range(6):
+        #     choose = np.random.randint(0, 2)
+        #     prediction, hidden = self.convlstm(features[choose], hidden)
+        maps = self.deconv(features[0][:, 0])
+        # print(targ)
+        # target = torch.reshape(target[:,0],(18,1,160,160))
 
         loss = F.binary_cross_entropy(maps, target)
 
@@ -78,20 +80,20 @@ class LitModel(pl.LightningModule):
         # training_step defines the train loop. It is independent of forward.
         image = batch['input']
         target = batch['target']
-        b, c, h, w = image.size()
+        # b, c, h, w = image.size()
         # print(image.size(), self.vgg11(image)['x5'].size())
         features = [
             torch.unsqueeze(self.resnet18(image)['x5'], dim=1),
-            torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
+            # torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
         ]
 
-        b, _, c, h, w = features[0].size()
-        # print(features[0].size())
-        hidden = self.convlstm._init_hidden(batch_size=b, image_size=(h, w))
-        for i in range(6):
-            # choose = np.random.randint(0, 2)
-            prediction, hidden = self.convlstm(features[0], hidden)
-        maps = self.deconv(prediction[-1][:, 0])
+        # b, _, c, h, w = features[0].size()
+        # # print(features[0].size())
+        # hidden = self.convlstm._init_hidden(batch_size=b, image_size=(h, w))
+        # for i in range(6):
+        #     # choose = np.random.randint(0, 2)
+        #     prediction, hidden = self.convlstm(features[0], hidden)
+        maps = self.deconv(features[0][:, 0])
 
         loss = F.binary_cross_entropy(maps, target)
 
@@ -116,13 +118,13 @@ class LitModel(pl.LightningModule):
         target = batch['target']
         b, c, h, w = image.size()
 
-        choose = np.random.randint(0, 2)
-        if choose:
-            features = torch.unsqueeze(self.resnet18(image)['x5'], dim=1)
-        else:
-            features = torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
+        # choose = np.random.randint(0, 2)
+        # if choose:
+        features = torch.unsqueeze(self.resnet18(image)['x5'], dim=1)
+        # else:
+        # features = torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
 
-        prediction, self.hidden = self.convlstm(features, self.hidden)
-        maps = self.deconv(prediction[-1][:, 0])
+        # prediction, self.hidden = self.convlstm(features, self.hidden)
+        maps = self.deconv(features[-1][:, 0])
 
         return {"out": maps, "target": target}

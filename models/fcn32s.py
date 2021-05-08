@@ -10,7 +10,7 @@ class FCN32s(nn.Module):
         # self.save_hyperparameters()
         self.relu = nn.ReLU(inplace=True)
         self.deconv1 = nn.ConvTranspose2d(
-            128, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
+            512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn1 = nn.BatchNorm2d(512)
         self.deconv2 = nn.ConvTranspose2d(
             512, 256, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)

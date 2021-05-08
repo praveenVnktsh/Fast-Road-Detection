@@ -13,6 +13,7 @@ class Configs():
         self.s = [2, 1, 2, 2, 2, 1, 1]  # stride of each conv stage
         self.t = [1, 1, 6, 6, 6, 6, 6]  # expansion factor t
         self.n = [1, 1, 2, 3, 4, 3, 3]  # number of repeat time
+        self.isSequence = False
 
         # output channel of each conv stage
         self.c = [32, 16, 24, 32, 64, 96, 160]
@@ -41,7 +42,7 @@ class Configs():
 
         # train parameters
         self.nEpochs = 151
-        self.batchSize = 512
+        self.batchSize = 35
         self.base_lr = 0.0002
         self.power = 0.9
         self.momentum = 0.9
