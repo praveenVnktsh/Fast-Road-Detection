@@ -126,6 +126,9 @@ class lit_custom_data(pl.LightningDataModule):
     def setup(self, stage=None):
 
         self.configs = Configs()
+        if stage is not None:
+            self.configs.datasetPath = stage + self.configs.datasetPath
+
         # self.dataset = CustomDataset(self.configs)
         self.dataset = TestDataset(self.configs)
         dataset_size = len(self.dataset)

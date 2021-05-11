@@ -12,7 +12,7 @@ class Configs():
 
         # dataset parameters
         self.image_size = 160
-        self.datasetPath = r"I:\dataset\cv\valset.pt"
+        self.datasetPath = "testset.pt"
 
         # train parameters
         self.batchSize = 16

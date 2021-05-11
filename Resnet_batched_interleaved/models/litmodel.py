@@ -1,7 +1,6 @@
 from models.convlstm import ConvLSTM
 from models.resnet import Resnet
 from models.fcn32s import FCN32s
-from models.vgg import VGGNet
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

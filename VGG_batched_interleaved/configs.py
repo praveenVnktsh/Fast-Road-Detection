@@ -10,7 +10,8 @@ class Configs():
 
         self.device = torch.device('cuda')
 
-        self.datasetPath = r"I:\dataset/cv/testset.pt"
+        self.datasetPath = r"testset.pt"
+
         self.shuffle = True
 
         # train parameters

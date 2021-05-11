@@ -47,7 +47,7 @@ class TrainDataset(Dataset):
         ])
 
     def __getitem__(self, index):
-        
+
         images = []
         segs = []
         flip = False
@@ -65,25 +65,24 @@ class TrainDataset(Dataset):
             images.append(image)
             segs.append(seg)
 
-        seg = torch.stack(tuple(segs), dim = 0)
-        image = torch.stack(tuple(images), dim = 0)
+        seg = torch.stack(tuple(segs), dim=0)
+        image = torch.stack(tuple(images), dim=0)
         real = self.nonorm(self.data[i]['front'])
 
-        return {'input': image, 'target': seg, 'real' : real}
+        return {'input': image, 'target': seg, 'real': real}
 
     def __len__(self):
         return self.length
 
 
-
 class TestDataset(Dataset):
 
     def __init__(self, dataset):
-        
+
         self.sequenceLength = 6
         self.device = configs.device
         self.size = (configs.image_size, configs.image_size)
-        
+
         self.data = dataset
 
         self.length = len(self.data)
@@ -107,13 +106,13 @@ class TestDataset(Dataset):
         ])
 
     def __getitem__(self, index):
-        
+
         image = self.transform(self.data[index]['front'])
         seg = self.segmentation(self.data[index]['road']).bool().float()
 
         real = self.nonorm(self.data[index]['front'])
 
-        return {'input': image, 'target': seg, 'real' : real}
+        return {'input': image, 'target': seg, 'real': real}
 
     def __len__(self):
         return self.length
@@ -124,11 +123,15 @@ class lit_custom_data(pl.LightningDataModule):
     def setup(self, stage=None):
 
         self.configs = Configs()
-        
+
+        if stage is not None:
+            self.configs.trainset = stage + self.configs.trainset
+            self.configs.valset = stage + self.configs.valset
+            self.configs.testset = stage + self.configs.testset
+
         self.cpu = 0
         self.pin = True
         print('Loading dataset')
-        
 
     def train_dataloader(self):
         dataset = TrainDataset(torch.load(self.configs.trainset))

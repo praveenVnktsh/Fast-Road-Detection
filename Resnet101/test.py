@@ -32,7 +32,7 @@ def test(iterator):
     model.freeze()
     model.eval()
     fourcc = cv2.VideoWriter_fourcc(*'X264')
-    outwrite = cv2.VideoWriter('output.mp4',fourcc, 60.0, (500,500))
+    outwrite = cv2.VideoWriter('output.mp4', fourcc, 60.0, (500, 500))
     its = 0
     with torch.no_grad():
         for i, batch in enumerate(iterator):
@@ -49,12 +49,14 @@ def test(iterator):
             t = target.detach().cpu().squeeze().numpy()
             o = out.detach().cpu().squeeze().numpy() > 0.5
 
-            iou = np.sum(np.bitwise_and(t.astype(bool), o.astype(bool))) / np.sum(np.bitwise_or(t.astype(bool), o.astype(bool)))
+            iou = np.sum(np.bitwise_and(t.astype(bool), o.astype(bool))) / \
+                np.sum(np.bitwise_or(t.astype(bool), o.astype(bool)))
             fpsStats.push(1/(end-start))
             iouStats.push(iou)
 
             if verbose:
-                print(f"frametime: {(end-start)*1000}ms, iou: {iou} avgfps: {fpsStats.mean()}, avgiou:{iouStats.mean()}")
+                print(
+                    f"frametime: {(end-start)*1000}ms, iou: {iou} avgfps: {fpsStats.mean()}, avgiou:{iouStats.mean()}")
                 img = np.transpose(
                     (real*255)[0].numpy().astype("uint8"), (1, 2, 0))
                 overlay = np.zeros(img.squeeze().shape)
@@ -79,9 +81,9 @@ if __name__ == '__main__':
     hparams = {
         'lr': 0.01
     }
-    model = LitModel.load_from_checkpoint("I:/dataset/cv/trained/vanilla_trained_sata/checkpoints_resnet101/epoch=119-step=55559.ckpt").cuda()
+    model = LitModel.load_from_checkpoint(
+        "I:/dataset/cv/trained/vanilla_trained_sata/resnet101/epoch=119-step=55559.ckpt").cuda()
 
     dataset = lit_custom_data()
     dataset.setup()
     test(dataset.test_dataloader())
-
