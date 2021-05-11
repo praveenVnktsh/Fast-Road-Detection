@@ -5,7 +5,11 @@ import torch
 from torchvision.transforms import transforms
 import matplotlib.pyplot as plt
 
+
 class CustomDataset(Dataset):
+    '''
+    Custom Dataset Loader to load n sequential images
+    '''
 
     def __init__(self, configs: Configs):
 
@@ -25,7 +29,7 @@ class CustomDataset(Dataset):
 
     def __getitem__(self, index):
 
-        if index > self.length :
+        if index > self.length:
             raise Exception(
                 f"Dataloader out of index. Max Index:{self.length - self.n_images}, Index asked:{index}.")
         images = []
