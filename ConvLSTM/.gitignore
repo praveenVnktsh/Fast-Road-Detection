@@ -1,0 +1,9 @@
+dataset.pt
+*.pth
+*events.out.tfevents*
+*.pyc
+*.out
+configs.py
+settings.json
+temp.png
+trained/

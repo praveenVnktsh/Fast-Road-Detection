@@ -1,0 +1,8 @@
+.ipynb_checkpoints
+.vscode
+*events.out.tfevents*
+*.pyc
+*.pth
+libs/models/__pycache__/jpu.cpython-37.pyc
+lightning_logs/
+dataset.pt

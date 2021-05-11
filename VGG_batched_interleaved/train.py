@@ -18,18 +18,13 @@ from pytorch_lightning import loggers
 from configs import Configs
 
 
-import os
-# os.environ["OPENBLAS_MAIN_FREE"] = '1'
 
-# class LightningMNISTClassifier(pl.LightningModule):
-if __name__ == '__main__':
-    hparams = {
-        'lr': 0.01
-    }
-    model = LitModel(hparams)
+hparams = {
+    'lr': 0.01
+}
+model = LitModel(hparams)
 
-    dataset = lit_custom_data()
+dataset = lit_custom_data()
 
-    trainer = pl.Trainer(gpus=1, )
-    trainer.fit(model, dataset)
-    print("hello")
+trainer = pl.Trainer(gpus=1)
+trainer.fit(model, dataset)

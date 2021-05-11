@@ -29,23 +29,17 @@ class LitModel(pl.LightningModule):
         return optimizer
 
     def forward(self, z):
-        # out = self.model.decode(z)
 
         ref_after = 0.9
         if np.random.rand() > ref_after:
             self.hidden = None
             print("Weights Cleared")
             features = torch.unsqueeze(self.vgg16(z)['x5'], dim=1)
-        # else:
-        features = torch.unsqueeze(self.vgg16(z)['x5'], dim=1)
-        # choose = np.random.randint(0, 2)
-        # # print(choose)
-        # if choose:
-        #     features = torch.unsqueeze(self.vgg11(z)['x5'], dim=1)
-        # else:
-        #     features = torch.unsqueeze(self.vgg16(z)['x5'], dim=1)
+        else:
+            features = torch.unsqueeze(self.vgg11(z)['x5'], dim=1)
 
         prediction, self.hidden = self.convlstm(features, self.hidden)
+
         out = self.deconv(prediction[-1][:, 0])
 
         return out
