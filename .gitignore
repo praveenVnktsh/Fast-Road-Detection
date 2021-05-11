@@ -27,3 +27,4 @@ models/__pycache__/fcn32s.cpython-37.pyc
 models/__pycache__/litmodel.cpython-37.pyc
 models/__pycache__/resnet.cpython-37.pyc
 models/__pycache__/vgg.cpython-37.pyc
+Resnet_batched_separate_interleaved/

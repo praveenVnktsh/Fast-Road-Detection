@@ -44,8 +44,8 @@ def test(model, iterator):
         iouStats.push(iou)
 
         if verbose:
-            # print(
-            # f"frametime: {(end-start)*1000}ms, iou: {iou} avg: {np.mean(np.array(avg_iou))}, avgfps:{np.mean(np.array(avg_fps))}")
+            print(
+            f"frametime: {(end-start)*1000}ms, iou: {iou} avg: {np.mean(np.array(avg_iou))}, avgfps:{np.mean(np.array(avg_fps))}")
             img = np.transpose(
                 (real*255)[0].numpy().astype("uint8"), (1, 2, 0))
             overlay = np.zeros(img.squeeze().shape)
