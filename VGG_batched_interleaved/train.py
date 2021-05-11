@@ -18,7 +18,6 @@ from pytorch_lightning import loggers
 from configs import Configs
 
 
-
 hparams = {
     'lr': 0.01
 }
