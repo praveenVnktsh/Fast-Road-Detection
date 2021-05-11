@@ -20,7 +20,8 @@ class LitModel(pl.LightningModule):
         self.resnet18 = Resnet(model='resnet18')
 
         self.extractors = [self.resnet18, self.resnet101]
-        self.convlstm = ConvLSTM(512, 128, kernel_size=(3, 3), num_layers=1, batch_first=True)
+        self.convlstm = ConvLSTM(512, 128, kernel_size=(
+            3, 3), num_layers=1, batch_first=True)
         self.deconv = FCN32s(n_class=1)
         self.hidden = None
         self.save_hyperparameters()
@@ -29,9 +30,8 @@ class LitModel(pl.LightningModule):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
         return optimizer
 
-    def forward(self, z, clear = False, choose = 0):
+    def forward(self, z, clear=False, choose=0):
 
-        
         # if clear:
         #     self.hidden = None
 
@@ -39,7 +39,7 @@ class LitModel(pl.LightningModule):
             features = torch.unsqueeze(self.resnet101(z)['x5'], dim=1)
             prediction, self.hidden = self.convlstm(features, self.hidden)
         # else:
-        
+
         features = torch.unsqueeze(self.resnet18(z)['x5'], dim=1)
 
         prediction, self.hidden = self.convlstm(features, self.hidden)
@@ -52,19 +52,17 @@ class LitModel(pl.LightningModule):
         image = batch['input']
         target = batch['target']
         b, c, h, w = image.size()
-        # print(image.size(), self.vgg11(image)['x5'].size())
         features = [
             torch.unsqueeze(self.resnet18(image)['x5'], dim=1),
             torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
         ]
 
         b, _, c, h, w = features[0].size()
-        # print(features[0].size())
         hidden = self.convlstm._init_hidden(batch_size=b, image_size=(h, w))
         for i in range(6):
             choose = np.random.randint(0, 2)
             prediction, hidden = self.convlstm(features[choose], hidden)
-            
+
         maps = self.deconv(prediction[-1][:, 0])
 
         loss = F.binary_cross_entropy(maps, target)
@@ -90,8 +88,8 @@ class LitModel(pl.LightningModule):
         # print(features[0].size())
         hidden = self.convlstm._init_hidden(batch_size=b, image_size=(h, w))
         for i in range(6):
-            # choose = np.random.randint(0, 2)
-            prediction, hidden = self.convlstm(features[0], hidden)
+            choose = np.random.randint(0, 2)
+            prediction, hidden = self.convlstm(features[choose], hidden)
         maps = self.deconv(prediction[-1][:, 0])
 
         loss = F.binary_cross_entropy(maps, target)

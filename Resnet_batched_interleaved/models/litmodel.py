@@ -33,16 +33,11 @@ class LitModel(pl.LightningModule):
         return optimizer
 
     def forward(self, z):
-        # out = self.model.decode(z)
-
-        # ref_after = 0.7
-        # if np.random.rand() > ref_after:
-        if self.index % 6   == 0:
+        if self.index % 6 == 0:
             self.hidden = None
             # print("Weights Cleared")
             features = torch.unsqueeze(self.resnet101(z)['x5'], dim=1)
             prediction, self.hidden = self.convlstm(features, self.hidden)
-        # else:
         features = torch.unsqueeze(self.resnet18(z)['x5'], dim=1)
 
         prediction, self.hidden = self.convlstm(features, self.hidden)
@@ -56,14 +51,13 @@ class LitModel(pl.LightningModule):
         image = batch['input']
         target = batch['target']
         b, c, h, w = image.size()
-        # print(image.size(), self.vgg11(image)['x5'].size())
         features = [
             torch.unsqueeze(self.resnet18(image)['x5'], dim=1),
             torch.unsqueeze(self.resnet101(image)['x5'], dim=1)
         ]
 
         b, _, c, h, w = features[0].size()
-        # print(features[0].size())
+
         hidden = self.convlstm._init_hidden(batch_size=b, image_size=(h, w))
         for i in range(6):
             choose = np.random.randint(0, 2)
