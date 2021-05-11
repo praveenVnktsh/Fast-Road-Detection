@@ -23,7 +23,7 @@ import numpy as np
 import timeit
 
 
-def test(iterator):
+def test(model, iterator):
     print("Starting test")
     verbose = True
     iouStats = Statistics()
@@ -33,7 +33,7 @@ def test(iterator):
     model.eval()
 
     fourcc = cv2.VideoWriter_fourcc(*'X264')
-    outwrite = cv2.VideoWriter('output.mp4',fourcc, 60.0, (500,500))
+    outwrite = cv2.VideoWriter('output.mp4', fourcc, 60.0, (500, 500))
 
     its = 0
     with torch.no_grad():
@@ -43,7 +43,7 @@ def test(iterator):
             target = batch['target']
             real = batch['real']
             its += 1
-            
+
             clear = True if its % 6 == 0 else False
 
             start = timeit.default_timer()
@@ -53,12 +53,14 @@ def test(iterator):
             t = target.detach().cpu().squeeze().numpy()
             o = out.detach().cpu().squeeze().numpy() > 0.5
 
-            iou = np.sum(np.bitwise_and(t.astype(bool), o.astype(bool))) / np.sum(np.bitwise_or(t.astype(bool), o.astype(bool)))
+            iou = np.sum(np.bitwise_and(t.astype(bool), o.astype(bool))) / \
+                np.sum(np.bitwise_or(t.astype(bool), o.astype(bool)))
             fpsStats.push(1/(end-start))
             iouStats.push(iou)
 
             if verbose:
-                print(f"frametime: {(end-start)*1000}ms, iou: {iou} avgfps: {fpsStats.mean()}, avgiou:{iouStats.mean()}")
+                print(
+                    f"frametime: {(end-start)*1000}ms, iou: {iou} avgfps: {fpsStats.mean()}, avgiou:{iouStats.mean()}")
                 img = np.transpose(
                     (real*255)[0].numpy().astype("uint8"), (1, 2, 0))
                 overlay = np.zeros(img.squeeze().shape)
@@ -78,15 +80,16 @@ def test(iterator):
     print("||STATS||")
     print('Avg fps', fpsStats.mean(), '+-', fpsStats.variance())
     print('Avg IoU', iouStats.mean(), '+-', iouStats.variance())
+    print("Output Video Stored as output.mp4")
 
 
 if __name__ == '__main__':
     hparams = {
         'lr': 0.01
     }
-    model = LitModel.load_from_checkpoint("I:/dataset/cv/trained/vanilla_trained_sata/resnet18/checkpoints/epoch=119-step=55559.ckpt").cuda()
+    model = LitModel.load_from_checkpoint(
+        "I:/dataset/cv/trained/vanilla_trained_sata/resnet18/checkpoints/epoch=119-step=55559.ckpt").cuda()
 
     dataset = lit_custom_data()
     dataset.setup()
-    test(dataset.test_dataloader())
-
+    test(model, dataset.test_dataloader())

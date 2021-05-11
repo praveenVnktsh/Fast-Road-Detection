@@ -23,7 +23,7 @@ import numpy as np
 import timeit
 
 
-def test(iterator):
+def test(model, iterator):
     print("Starting test")
     verbose = True
     iouStats = Statistics()
@@ -75,6 +75,7 @@ def test(iterator):
     print("||STATS||")
     print('Avg fps', fpsStats.mean(), '+-', fpsStats.variance())
     print('Avg IoU', iouStats.mean(), '+-', iouStats.variance())
+    print("Output Video Stored as output.mp4")
 
 
 if __name__ == '__main__':
@@ -86,4 +87,4 @@ if __name__ == '__main__':
 
     dataset = lit_custom_data()
     dataset.setup()
-    test(dataset.test_dataloader())
+    test(model, dataset.test_dataloader())

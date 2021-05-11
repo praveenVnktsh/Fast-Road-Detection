@@ -23,14 +23,14 @@ import numpy as np
 import timeit
 
 
-def test(iterator):
+def test(model, iterator):
     print("Starting test")
     verbose = True
     iouStats = Statistics()
     fpsStats = Statistics()
 
     fourcc = cv2.VideoWriter_fourcc(*'X264')
-    outwrite = cv2.VideoWriter('output.mp4',fourcc, 60.0, (500,500))
+    outwrite = cv2.VideoWriter('output.mp4', fourcc, 60.0, (500, 500))
 
     model.freeze()
     model.eval()
@@ -45,13 +45,14 @@ def test(iterator):
             clear = True if its % 10 == 0 else False
             # clear = True if np.random.randn() > 0.9 else False
             start = timeit.default_timer()
-            out = model(image, clear, choose = 1 if not clear else 0)
+            out = model(image, clear, choose=1 if not clear else 0)
             end = timeit.default_timer()
 
             t = target.detach().cpu().squeeze().numpy()
             o = out.detach().cpu().squeeze().numpy() > 0.5
 
-            iou = np.sum(np.bitwise_and(t.astype(bool), o.astype(bool))) / np.sum(np.bitwise_or(t.astype(bool), o.astype(bool)))
+            iou = np.sum(np.bitwise_and(t.astype(bool), o.astype(bool))) / \
+                np.sum(np.bitwise_or(t.astype(bool), o.astype(bool)))
             fpsStats.push(1/(end-start))
             iouStats.push(iou)
 
@@ -75,15 +76,16 @@ def test(iterator):
     print("||STATS||")
     print('Avg fps', fpsStats.mean(), '+-', fpsStats.variance())
     print('Avg IoU', iouStats.mean(), '+-', iouStats.variance())
+    print("Output Video Stored as output.mp4")
 
 
 if __name__ == '__main__':
     hparams = {
         'lr': 0.01
     }
-    model = LitModel.load_from_checkpoint("I:/dataset/cv/trained/LSTM_Sequential/checkpoints/epoch=119-step=55559.ckpt").cuda()
+    model = LitModel.load_from_checkpoint(
+        "I:/dataset/cv/trained/LSTM_Sequential/checkpoints/epoch=119-step=55559.ckpt").cuda()
 
     dataset = lit_custom_data()
     dataset.setup()
-    test(dataset.test_dataloader())
-
+    test(model, dataset.test_dataloader())
