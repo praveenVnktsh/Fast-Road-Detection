@@ -40,10 +40,9 @@ class LitModel(pl.LightningModule):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
         return optimizer
 
-    def forward(self, z):
-        if self.index % 6 == 0:
+    def forward(self, z, clear=False, choose=0):
+        if choose == 0:
             self.hidden = None
-            # print("Weights Cleared")
             features = torch.unsqueeze(self.resnet101(z)['x5'], dim=1)
             prediction, self.hidden = self.convlstm(features, self.hidden)
         features = torch.unsqueeze(self.resnet18(z)['x5'], dim=1)
