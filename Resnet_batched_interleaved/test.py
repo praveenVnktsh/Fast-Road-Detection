@@ -18,7 +18,6 @@ from pytorch_lightning import loggers
 from configs import Configs
 
 
-
 import os
 
 import cv2
@@ -36,11 +35,9 @@ def test(iterator):
     model.freeze()
     model.eval()
     fourcc = cv2.VideoWriter_fourcc(*'X264')
-    outwrite = cv2.VideoWriter('output.mp4',fourcc, 60.0, (500,500))
+    outwrite = cv2.VideoWriter('output.mp4', fourcc, 60.0, (500, 500))
 
     for i, batch in enumerate(iterator):
-        # if i % 2 == 0:
-        #     continue
 
         image = batch['input'].cuda()
         target = batch['target']
@@ -53,11 +50,10 @@ def test(iterator):
         t = target.detach().cpu().squeeze().numpy()
         o = out.detach().cpu().squeeze().numpy() > 0.5
 
-        iou = np.sum(np.bitwise_and(t.astype(bool), o.astype(bool))) / np.sum(np.bitwise_or(t.astype(bool), o.astype(bool)))
+        iou = np.sum(np.bitwise_and(t.astype(bool), o.astype(bool))) / \
+            np.sum(np.bitwise_or(t.astype(bool), o.astype(bool)))
         avg_iou.append(iou)
         avg_fps.append(1/(end-start))
-
-        
 
         if verbose:
             # print(
@@ -80,8 +76,8 @@ def test(iterator):
     outwrite.release()
 
     print("||STATS||")
-    print('avgfps' ,np.mean(np.array(avg_fps)))
-    print('iou' ,np.mean(np.array(avg_iou)))
+    print('avgfps', np.mean(np.array(avg_fps)))
+    print('iou', np.mean(np.array(avg_iou)))
 
 
 # class LightningMNISTClassifier(pl.LightningModule):
@@ -96,7 +92,3 @@ if __name__ == '__main__':
 
     dataset.setup()
     test(dataset.test_dataloader())
-    # trainer = pl.Trainer(gpus=1, )
-    # trainer.test(model, dataset.test_dataloader())
-
-    print("hello")

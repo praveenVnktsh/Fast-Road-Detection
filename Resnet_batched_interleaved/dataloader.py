@@ -16,6 +16,7 @@ from configs import Configs
 
 configs = Configs()
 
+
 class TestDataset(Dataset):
 
     def __init__(self, configs: Configs):
@@ -29,10 +30,6 @@ class TestDataset(Dataset):
 
         print(self.length, 'images in', self.path)
 
-        # transforms.Resize(256),
-        # transforms.CenterCrop(224),
-        # transforms.ToTensor(),
-        # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         self.transform = transforms.Compose([
             transforms.ToPILImage(),
             transforms.Resize(self.size),
@@ -80,10 +77,6 @@ class CustomDataset(Dataset):
 
         print(self.length, 'images in', self.path)
 
-        # transforms.Resize(256),
-        # transforms.CenterCrop(224),
-        # transforms.ToTensor(),
-        # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         self.transform = transforms.Compose([
             transforms.ToPILImage(),
             transforms.Resize(self.size),

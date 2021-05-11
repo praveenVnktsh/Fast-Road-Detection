@@ -1,6 +1,6 @@
-## Batched Interleaved Model
+## Sequential Interleaved Model
 
-Using N images to train the ConvLSTM, we train this model over the lane segementation dataset.
+Using N time seperated images to train the ConvLSTM, we train this model over the lane segementation dataset.
 
 This is our model:
 

@@ -28,10 +28,8 @@ if __name__ == '__main__':
     }
     model = LitModel(hparams)
 
-    dataset = lit_custom_data(
-        "/home/i1/lookingfastslow/lr_find_temp_model.ckpt")
+    dataset = lit_custom_data()
 
     trainer = pl.Trainer(gpus=1, max_epochs=120)
     # trainer.tune(model, dataset)
     trainer.fit(model, dataset)
-    print("hello")

@@ -3,11 +3,17 @@ import torch
 
 
 class FCN32s(nn.Module):
+    '''
+    A reminant of the fcn32s, where we have removed the feature 
+    extractor part that is directedly replaced by the pretrained 
+    resnet feature extractors.
+
+    This is only the Decoder Part
+    '''
 
     def __init__(self, n_class):
         super(FCN32s, self).__init__()
         self.n_class = n_class
-        # self.save_hyperparameters()
         self.relu = nn.ReLU(inplace=True)
         self.deconv1 = nn.ConvTranspose2d(
             128, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)

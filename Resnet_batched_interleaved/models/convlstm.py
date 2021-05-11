@@ -43,7 +43,7 @@ class ConvLSTMCell(nn.Module):
 
     def forward(self, input_tensor, cur_state):
         h_cur, c_cur = cur_state
-        # print(input_tensor.size(), h_cur.size())
+
         # concatenate along channel axis
         combined = torch.cat([input_tensor, h_cur], dim=1)
 
@@ -142,12 +142,12 @@ class ConvLSTM(nn.Module):
         b, _, _, h, w = input_tensor.size()
 
         # Implement stateful ConvLSTM
-        # if hidden_state is not None:
-        #     raise NotImplementedError()
-        # else:
-        # Since the init is done in forward. Can send image size here
-        if hidden_state is None:
-            hidden_state = self._init_hidden(batch_size=b, image_size=(h, w))
+        if hidden_state is not None:
+            raise NotImplementedError()
+        else:
+            # Since the init is done in forward. Can send image size here
+            hidden_state = self._init_hidden(batch_size=b,
+                                             image_size=(h, w))
 
         layer_output_list = []
         last_state_list = []
