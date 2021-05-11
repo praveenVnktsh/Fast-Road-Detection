@@ -1,29 +1,11 @@
 from __future__ import print_function
 from models.litmodel import LitModel
-from models.fcn32s import FCN32s
-from models.vgg import VGGNet
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-from torchvision import models
-from torchvision.models.vgg import VGG
-import pytorch_lightning as pl
-from torch.optim.rmsprop import RMSprop
-
-
-from dataloader import CustomDataset, lit_custom_data
-from pytorch_lightning import loggers
-from configs import Configs
-
-
-import os
+from dataloader import lit_custom_data
+from runstats import Statistics
 
 import cv2
-import numpy as np
-
 import timeit
+import numpy as np
 
 avg_iou = []
 avg_fps = []
@@ -31,18 +13,24 @@ avg_fps = []
 
 def test(model, iterator):
     verbose = True
+    iouStats = Statistics()
+    fpsStats = Statistics()
 
-    model.freeze()
-    model.eval()
     fourcc = cv2.VideoWriter_fourcc('F', 'M', 'P', '4')
     outwrite = cv2.VideoWriter('output.mp4', fourcc, 60.0, (500, 500))
 
+    model.freeze()
+    model.eval()
+    its = 0
     for i, batch in enumerate(iterator):
 
         image = batch['input'].cuda()
         target = batch['target']
         real = batch['real']
 
+        its += 1
+        clear = True if its % 10 == 0 else False
+        # clear = True if np.random.randn() > 0.9 else False
         start = timeit.default_timer()
         out = model(image)
         end = timeit.default_timer()
@@ -52,8 +40,8 @@ def test(model, iterator):
 
         iou = np.sum(np.bitwise_and(t.astype(bool), o.astype(bool))) / \
             np.sum(np.bitwise_or(t.astype(bool), o.astype(bool)))
-        avg_iou.append(iou)
-        avg_fps.append(1/(end-start))
+        fpsStats.push(1/(end-start))
+        iouStats.push(iou)
 
         if verbose:
             # print(
@@ -76,8 +64,8 @@ def test(model, iterator):
     cv2.destroyAllWindows()
 
     print("||STATS||")
-    print('avgfps', np.mean(np.array(avg_fps)))
-    print('iou', np.mean(np.array(avg_iou)))
+    print('Avg fps', fpsStats.mean(), '+-', fpsStats.variance())
+    print('Avg IoU', iouStats.mean(), '+-', iouStats.variance())
     print("Output Video Stored as output.mp4")
 
 
