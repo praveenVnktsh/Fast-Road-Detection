@@ -32,7 +32,7 @@ def test(model, iterator):
     model.freeze()
     model.eval()
 
-    fourcc = cv2.VideoWriter_fourcc(*'X264')
+    fourcc = cv2.VideoWriter_fourcc('F', 'M', 'P', '4')
     outwrite = cv2.VideoWriter('output.mp4', fourcc, 60.0, (500, 500))
 
     its = 0
@@ -71,10 +71,10 @@ def test(model, iterator):
                 out = cv2.resize(out, (500, 500), interpolation=cv2.INTER_AREA)
                 outwrite.write(out)
 
-                cv2.imshow('Out', out)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-
+                # cv2.imshow('Out', out)
+                # if cv2.waitKey(1) & 0xFF == ord('q'):
+                #     break
+    outwrite.release()
     cv2.destroyAllWindows()
 
     print("||STATS||")
