@@ -88,18 +88,18 @@ Implemented [here](Resnet_sequential_interleaved)
 ### Qualitative Results
 
 <p align="center">
-  <img width="300" height="400" src="extras/resnet18.jpg">
-  <img width="300" height="400" src="extras/resnet101.jpg">
+  <img width="300" height="400" src="extras/resnet18.gif">
+  <img width="300" height="400" src="extras/resnet101.gif">
 <br>
-left: Resnet18 , Right: Resnet101    
+Left: Resnet18 , Right: Resnet101    
     
 </p>
 
 <p align="center">
-  <img width="300" height="400" src="extras/batch.jpg">
-  <img width="300" height="400" src="extras/seq.jpg">
+  <img width="300" height="400" src="extras/batch.gif">
+  <img width="300" height="400" src="extras/seq.gif">
 <br>
-left: Batched Interleaved , Right: Sequential Interleaved  
+Left: Batched Interleaved , Right: Sequential Interleaved  
 </p>
 
 Comparing results between different models, we see thatthe Vanilla ResNet models and interleaved models perform similarly at each given frame. We notice that occasionally the prediction moves into the pavement as well. However, it is evident from the videos that the temporal consistency ofthe interleaved models is far superior than the vanilla models which simply treat each frame as an independent prediction.
