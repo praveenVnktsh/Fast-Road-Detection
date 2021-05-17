@@ -15,11 +15,13 @@ class Resnet(nn.Module):
         model = models.resnet101(pretrained=pretrained)
         modules = list(model.children())[:-3]
         self.base = nn.Sequential(*modules)
+
+
         modules = list(model.children())[-3:-2]
         
-        self.reducesize = nn.Conv2d(1024, 2048, 3, 2, 1)
         self.final = nn.Sequential(*modules)
 
+        self.reducesize = nn.Conv2d(1024, 512, 3, 2, 1)
         self.finalReduction = nn.Conv2d(2048, 512, 3, 1, 1)
 
 
@@ -39,7 +41,7 @@ class Resnet(nn.Module):
         temp = self.base(x)
         output['final'] = self.finalReduction(self.final(temp))
 
-        output['mid'] = self.finalReduction(self.reducesize(temp))
+        output['mid'] = self.reducesize(temp)
 
         return output
 

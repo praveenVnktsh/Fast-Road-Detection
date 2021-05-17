@@ -10,9 +10,9 @@ class Configs():
 
         self.device = torch.device('cuda')
 
-        self.trainset = "trainset.pt"
+        self.trainset = "valset.pt"
         self.valset = "valset.pt"
-        self.testset = "testset.pt"
+        self.testset = "valset.pt"
         self.image_size = 160
         # model params
         self.batchSize = 16
