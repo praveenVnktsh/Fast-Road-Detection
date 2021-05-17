@@ -1,7 +1,7 @@
 from __future__ import print_function
 from models.litmodel import LitModel
 from models.fcn32s import FCN32s
-
+from pytorch_lightning.callbacks import ModelCheckpoint
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -26,8 +26,14 @@ if __name__ == '__main__':
 
     dataset = lit_custom_data()
     dataset.setup()
-
-    trainer = pl.Trainer(gpus=1, max_epochs=120)
+    checkpoint_callback = ModelCheckpoint(
+        monitor='val_loss',
+        dirpath='/content/drive/Shareddrives/3DCV/Trained Models/101partialpredictor/',
+        filename='partPredict101-{epoch:02d}-{val_loss:.2f}',
+        save_top_k=3,
+        mode='min',
+    )
+    trainer = pl.Trainer(gpus=1, max_epochs=120, callbacks=[checkpoint_callback])
     # trainer.tune(model, dataset)
     trainer.fit(model, dataset)
-    print("hello")
+

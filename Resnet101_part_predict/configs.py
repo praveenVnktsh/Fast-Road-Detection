@@ -9,7 +9,9 @@ class Configs():
     def __init__(self):
 
         self.device = torch.device('cuda')
-
+        # self.trainset = "/content/drive/Shareddrives/3DCV/Datasets/trainset.pt"
+        # self.valset = "/content/drive/Shareddrives/3DCV/Datasets/valset.pt"
+        # self.testset = "/content/drive/Shareddrives/3DCV/Datasets/testset.pt"
         self.trainset = "valset.pt"
         self.valset = "valset.pt"
         self.testset = "valset.pt"
