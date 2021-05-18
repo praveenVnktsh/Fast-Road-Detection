@@ -41,7 +41,7 @@ class LitModel(pl.LightningModule):
         image = batch['input']
         target = batch['target']
 
-        b = self.configs.batchSize
+        b = image.size(0)
         sLength = 6
         c = 512
         h = 5
@@ -87,7 +87,7 @@ class LitModel(pl.LightningModule):
         data = torch.cat((image[:, -1].detach()[:n_rows], outmap.float()[
             :n_rows], targetmap.detach()[:n_rows]), dim=2)
 
-        self.log('train_loss', loss, on_step=True,
+        self.log('val_loss', loss, on_step=True,
                  on_epoch=True, prog_bar=True, logger=True)
         self.logger.experiment.add_images(
             'validateImagesIndex0', data, self.current_epoch)
