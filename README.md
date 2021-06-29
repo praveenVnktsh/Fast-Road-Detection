@@ -1,7 +1,7 @@
 ## Memory Guided Road Detection
 
 ---
-
+View manuscript here : https://arxiv.org/abs/2106.14184
 In self driving car applications, there is a require-ment to predict the location of the lane given an input RGBfront facing image. In this paper, we propose an architecture thatallows us to increase the speed and robustness of road detectionwithout a large hit in accuracy by introducing an underlyingshared feature space that is propagated over time, which servesas a flowing dynamic memory. By utilizing the gist of previousframes, we train the network to predict the current road with agreater accuracy and lesser deviation from previous frames.
 
 ## Demo
