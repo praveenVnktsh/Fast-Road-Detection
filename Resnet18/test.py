@@ -8,11 +8,9 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torchvision import models
 from torchvision.models.vgg import VGG
-import pytorch_lightning as pl
 from torch.optim.rmsprop import RMSprop
 
 from dataloader import lit_custom_data
-from pytorch_lightning import loggers
 from configs import Configs
 from runstats import Statistics, Regression
 import os

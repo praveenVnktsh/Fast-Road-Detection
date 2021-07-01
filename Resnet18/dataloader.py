@@ -9,7 +9,6 @@ from torch.optim.rmsprop import RMSprop
 import torchvision
 import numpy as np
 
-import pytorch_lightning as pl
 from torchvision.transforms.functional import hflip
 
 from configs import Configs
@@ -118,7 +117,7 @@ class TestDataset(Dataset):
         return self.length
 
 
-class lit_custom_data(pl.LightningDataModule):
+class lit_custom_data():
 
     def setup(self, stage=None):
 

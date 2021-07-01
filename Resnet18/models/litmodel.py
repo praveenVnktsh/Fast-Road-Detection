@@ -5,11 +5,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-import pytorch_lightning as pl
 import numpy as np
+from tensorboardX import SummaryWriter
 
-
-class LitModel(pl.LightningModule):
+class LitModel():
 
     def __init__(self, hparams):
         super().__init__()
@@ -23,15 +22,19 @@ class LitModel(pl.LightningModule):
         self.convlstm = ConvLSTM(512, 128, kernel_size=(3, 3), num_layers=1, batch_first=True)
         self.deconv = FCN32s(n_class=1)
         self.hidden = None
-        self.save_hyperparameters()
+        self.logger = SummaryWriter()
+
+
+
+        
+
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        params = self.resnet101.parameters() + self.resnet18.parameters() + self.convlstm.parameters() +  self.deconv.parameters()
+        optimizer = torch.optim.Adam(params, lr=self.learning_rate)
         return optimizer
 
     def forward(self, z,):
-
-        
 
         features = self.resnet18(z)['x5']
         out = self.deconv(features)
@@ -60,8 +63,7 @@ class LitModel(pl.LightningModule):
 
         loss = F.binary_cross_entropy(maps, target)
 
-        self.log('train_loss', loss, on_step=False,
-                 on_epoch=True, prog_bar=True, logger=True)
+        self.logger.add_custom_scalars({'train_loss': loss})
 
         dic = {'loss': loss}
         return dic
@@ -94,9 +96,8 @@ class LitModel(pl.LightningModule):
         data = torch.cat((image.detach()[:n_rows], outmap.float()[
             :n_rows], targetmap.detach()[:n_rows]), dim=2)
 
-        self.log('train_loss', loss, on_step=True,
-                 on_epoch=True, prog_bar=True, logger=True)
-        self.logger.experiment.add_images(
+        self.logger.add_custom_scalars({'val_loss': loss})
+        self.logger.add_images(
             'validateImagesIndex0', data, self.current_epoch)
 
         dic = {'loss': loss}
