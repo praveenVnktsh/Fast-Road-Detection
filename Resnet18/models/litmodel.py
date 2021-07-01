@@ -23,14 +23,25 @@ class LitModel():
         self.deconv = FCN32s(n_class=1)
         self.hidden = None
         self.logger = SummaryWriter()
+        self.runloc = self.logger.logdir
 
 
 
-        
+    def save(self, optimizer, epoch):
+        dic = {
+            'optim' : optimizer, 
+            'model' : {
+                'resnet101' : self.resnet101.state_dict(),
+                'resnet18' : self.resnet18.state_dict(),
+                'deconv' : self.deconv.state_dict(),
+                'convlstm' : self.convlstm.state_dict(),
+            }
+        }
+        torch.save(dic, f'{self.runloc}/ckpts/epoch_{epoch}.pt')
 
 
     def configure_optimizers(self):
-        params = self.resnet101.parameters() + self.resnet18.parameters() + self.convlstm.parameters() +  self.deconv.parameters()
+        params = list(self.resnet101.parameters()) + list(self.resnet18.parameters()) + list(self.convlstm.parameters()) +  list(self.deconv.parameters())
         optimizer = torch.optim.Adam(params, lr=self.learning_rate)
         return optimizer
 
@@ -45,6 +56,7 @@ class LitModel():
         # training_step defines the train loop. It is independent of forward.
         image = batch['input']
         target = batch['target']
+        print(image.size())
         b, c, h, w = image.size()
         # print(image.size(), self.vgg11(image)['x5'].size())
         features = [

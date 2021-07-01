@@ -11,7 +11,7 @@ from torchvision.models.vgg import VGG
 from torch.optim.rmsprop import RMSprop
 
 
-from dataloader import CustomDataset, lit_custom_data
+from dataloader import lit_custom_data
 
 
 import os
@@ -21,7 +21,7 @@ import os
 
 def trainEpoch(model, loader):
 
-    for index, batch in loader:
+    for index, batch in enumerate(loader):
         optimizer.zero_grad()
         loss = model.training_step(batch, index)['loss']
         loss.backward()
@@ -30,8 +30,8 @@ def trainEpoch(model, loader):
 def valEpoch(model, loader):
 
     with torch.no_grad():
-        for index, batch in loader:
-            loss = model.training_step(batch, index)['loss']
+        for index, batch in enumerate(loader):
+            loss = model.validation_step(batch, index)['loss']
 
 
 if __name__ == '__main__':
@@ -40,11 +40,14 @@ if __name__ == '__main__':
     }
     model = LitModel(hparams)
 
-    dataset = lit_custom_data("/home/i1/lookingfastslow/lr_find_temp_model.ckpt")
+    dataset = lit_custom_data()
     trainLoader = dataset.train_dataloader()
     valLoader = dataset.test_dataloader()
     optimizer = model.configure_optimizers()
     for epoch in range(120):
         trainEpoch(model, trainLoader)
         valEpoch(model,  valLoader)
+
+        if epoch % 20 == 0:
+            model.save(optimizer, epoch)
 

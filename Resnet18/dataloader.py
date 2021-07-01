@@ -119,7 +119,7 @@ class TestDataset(Dataset):
 
 class lit_custom_data():
 
-    def setup(self, stage=None):
+    def __init__(self, stage=None):
 
         self.configs = Configs()
 
@@ -135,12 +135,12 @@ class lit_custom_data():
     def train_dataloader(self):
         dataset = TrainDataset(torch.load(self.configs.trainset))
         return DataLoader(dataset, batch_size=self.configs.batchSize,
-                          num_workers=self.cpu, sampler=SubsetRandomSampler(self.trainIndices), pin_memory=self.pin)
+                          num_workers=self.cpu,  pin_memory=self.pin)
 
     def val_dataloader(self):
         dataset = TrainDataset(torch.load(self.configs.valset))
         return DataLoader(dataset, batch_size=self.configs.batchSize,
-                          num_workers=self.cpu, sampler=SubsetRandomSampler(self.valIndices), pin_memory=self.pin)
+                          num_workers=self.cpu,  pin_memory=self.pin)
 
     def test_dataloader(self):
         dataset = TestDataset(torch.load(self.configs.testset))
